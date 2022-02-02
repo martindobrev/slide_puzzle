@@ -5,6 +5,7 @@ import 'package:very_good_slide_puzzle/audio_control/audio_control.dart';
 import 'package:very_good_slide_puzzle/dashatar/dashatar.dart';
 import 'package:very_good_slide_puzzle/l10n/l10n.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
+import 'package:very_good_slide_puzzle/madparticles/madparticles_theme.dart';
 import 'package:very_good_slide_puzzle/models/models.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
 import 'package:very_good_slide_puzzle/simple/simple.dart';
@@ -46,6 +47,7 @@ class PuzzlePage extends StatelessWidget {
             initialThemes: [
               const SimpleTheme(),
               context.read<DashatarThemeBloc>().state.theme,
+              const MadParticlesTheme(),
             ],
           ),
         ),
