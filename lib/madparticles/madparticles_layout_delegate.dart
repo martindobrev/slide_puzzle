@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:very_good_slide_puzzle/colors/colors.dart';
 import 'package:very_good_slide_puzzle/l10n/l10n.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
+import 'package:very_good_slide_puzzle/madparticles/particle_controller.dart';
 import 'package:very_good_slide_puzzle/models/models.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
 import 'package:very_good_slide_puzzle/simple/simple_puzzle_layout_delegate.dart';
@@ -109,14 +110,22 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: size,
-      mainAxisSpacing: spacing,
-      crossAxisSpacing: spacing,
-      children: tiles,
+    return Stack(
+      alignment: Alignment.topLeft,
+      children: [
+        GridView.count(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: size,
+          mainAxisSpacing: spacing,
+          crossAxisSpacing: spacing,
+          children: tiles,
+        ),
+        ParticleController(
+            Size(size.toDouble() * 100, size.toDouble() * 100), 20,
+            key: const Key('test')),
+      ],
     );
   }
 }
