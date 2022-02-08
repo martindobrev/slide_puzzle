@@ -28,7 +28,7 @@ class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
             dimension: _BoardSize.small,
             child: MadParticlesPuzzleBoard(
               key: const Key('simple_puzzle_board_small'),
-              size: size,
+              size: _BoardSize.small.toInt(),
               tiles: tiles,
               spacing: 5,
             ),
@@ -37,7 +37,7 @@ class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
             dimension: _BoardSize.medium,
             child: MadParticlesPuzzleBoard(
               key: const Key('simple_puzzle_board_medium'),
-              size: size,
+              size: _BoardSize.medium.toInt(),
               tiles: tiles,
             ),
           ),
@@ -45,7 +45,7 @@ class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
             dimension: _BoardSize.large,
             child: MadParticlesPuzzleBoard(
               key: const Key('simple_puzzle_board_large'),
-              size: size,
+              size: _BoardSize.large.toInt(),
               tiles: tiles,
             ),
           ),
@@ -94,6 +94,7 @@ abstract class _BoardSize {
   static double large = 472;
 }
 
+/// Puzzle board for the MadParticles
 class MadParticlesPuzzleBoard extends StatelessWidget {
   const MadParticlesPuzzleBoard(
       {Key? key, required this.size, required this.tiles, this.spacing = 8})
@@ -110,6 +111,7 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.select((PuzzleBloc bloc) => bloc.state);
     return Stack(
       alignment: Alignment.topLeft,
       children: [
@@ -123,8 +125,11 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
           children: tiles,
         ),
         ParticleController(
-            Size(size.toDouble() * 100, size.toDouble() * 100), 20,
-            key: const Key('test')),
+          Size(size.toDouble(), size.toDouble()),
+          100,
+          state,
+          key: const Key('test'),
+        ),
       ],
     );
   }

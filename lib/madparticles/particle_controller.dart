@@ -4,39 +4,35 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:very_good_slide_puzzle/madparticles/particle.dart';
+import 'package:very_good_slide_puzzle/puzzle/bloc/puzzle_bloc.dart';
 
+///
 class ParticleController extends StatefulWidget {
+  ///
+  const ParticleController(
+    this.size,
+    this.numberOfParticles,
+    this.state, {
+    required Key key,
+  }) : super(key: key);
+
+  ///
   final int numberOfParticles;
+
+  ///
   final Size size;
 
-  ParticleController(this.size, this.numberOfParticles, {required Key key})
-      : super(key: key);
+  ///
+  final PuzzleState state;
+
   @override
-  State<StatefulWidget> createState() =>
-      ParticleControllerState(this.size, this.numberOfParticles);
+  State<StatefulWidget> createState() => ParticleControllerState();
 }
 
+///
 class ParticleControllerState extends State<ParticleController> {
-  final Size size;
-  final int numberOfParticles;
-  ParticleControllerState(this.size, this.numberOfParticles) {
-    final random = Random();
+  final List<Particle> _particles = [];
 
-    for (var i = 0; i < this.numberOfParticles; i++) {
-      final initialOffset = Offset(
-          random.nextInt(size.width.toInt()).toDouble(),
-          random.nextInt(size.height.toInt()).toDouble());
-      final speed = 0.5 + random.nextInt(2).toDouble();
-      final direction = random.nextDouble() * 360;
-      particles.add(Particle(initialOffset, speed, direction));
-    }
-  }
-
-  List<Particle> particles = [];
-  List<Offset> get particlePositions =>
-      this.particles.map((particle) => particle.position).toList();
-
-  List<Offset> targetPositions = [];
   late Ticker _ticker;
 
   @override
@@ -44,76 +40,88 @@ class ParticleControllerState extends State<ParticleController> {
     super.initState();
     _ticker = Ticker(_tick);
     _ticker.start();
+
+    final random = Random();
+
+    for (var i = 0; i < widget.numberOfParticles; i++) {
+      final initialOffset = Offset(
+        random.nextInt(widget.size.width.toInt()).toDouble(),
+        random.nextInt(widget.size.height.toInt()).toDouble(),
+      );
+      final speed = 0.5 + random.nextInt(2).toDouble();
+      final direction = random.nextDouble() * 360;
+      _particles.add(Particle(initialOffset, speed, direction));
+    }
   }
 
   void _tick(Duration duration) {
-    this.particles.forEach((particle) => particle.move(this.size));
+    //print(widget.state.puzzle.toString());
+    for (final particle in _particles) {
+      particle.move(widget.size);
+    }
     setState(() {});
   }
 
   @override
   void dispose() {
     super.dispose();
-    print('DISPOSED');
-
-    if (_ticker != null) {
-      _ticker.dispose();
-      _ticker.stop();
-    }
+    _ticker
+      ..dispose()
+      ..stop();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        width: size.width,
-        height: size.height,
-        child:
-            CustomPaint(painter: MadParticlePainter(this.particlePositions)));
+    return SizedBox(
+      width: widget.size.width,
+      height: widget.size.height,
+      child: CustomPaint(
+        painter: MadParticlePainter(
+          _particles.map((particle) => particle.position).toList(),
+        ),
+      ),
+    );
   }
 
+  ///
   void setTargetPositions(List<Offset> offsets) {
-    if (offsets == null || offsets.isEmpty) {
-      for (var i = 0; i < this.particles.length; i++) {
-        this.particles[i].targetPosition = null;
+    if (offsets.isEmpty) {
+      for (var i = 0; i < _particles.length; i++) {
+        _particles[i].targetPosition = null;
       }
       return;
     }
 
     var ratio = 1.0;
-    if (offsets.length > this.particles.length) {
-      ratio = offsets.length / this.particles.length;
-      for (var i = 0; i < this.particles.length; i++) {
-        this.particles[i].targetPosition = offsets[(i * ratio).ceil()];
+    if (offsets.length > _particles.length) {
+      ratio = offsets.length / _particles.length;
+      for (var i = 0; i < _particles.length; i++) {
+        _particles[i].targetPosition = offsets[(i * ratio).ceil()];
       }
     } else {
       for (var i = 0; i < offsets.length; i++) {
-        this.particles[i].targetPosition = offsets[i];
+        _particles[i].targetPosition = offsets[i];
       }
     }
   }
 }
 
+/// Custom painter for painting simple particles
 class MadParticlePainter extends CustomPainter {
-  final List<Offset> particles;
+  /// Constructor for the painter
+  const MadParticlePainter(this.particles);
 
-  MadParticlePainter(this.particles);
+  /// Offset positions for the particles
+  final List<Offset> particles;
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint normalPaint = Paint();
-    normalPaint.color = Colors.black;
-    normalPaint.strokeWidth = 2;
-    normalPaint.strokeCap = StrokeCap.round;
-    normalPaint.blendMode = BlendMode.colorBurn;
-    canvas.drawPoints(PointMode.points, this.particles, normalPaint);
-
-    Paint backgroundPaint = Paint();
-    backgroundPaint.color = Colors.white;
-    backgroundPaint.strokeWidth = 10;
-    backgroundPaint.style = PaintingStyle.stroke;
-    backgroundPaint.blendMode = BlendMode.exclusion;
-
-    //canvas.drawCircle(Offset(150, 150), size.shortestSide * 0.4, backgroundPaint);
+    final normalPaint = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    //normalPaint.blendMode = BlendMode.colorBurn;
+    canvas.drawPoints(PointMode.points, particles, normalPaint);
   }
 
   @override
