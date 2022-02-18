@@ -10,6 +10,9 @@ import 'package:very_good_slide_puzzle/models/models.dart';
 /// The class is a simple helper that calculates the movements of a single
 /// particle in the MadParticles puzzle board
 class Particle {
+  /// Particle class constructor with its basic properties
+  Particle(this.position, this.speed, this.direction, this.tile);
+
   /// current position of the particle
   /// Since particles can move across the whole puzzle board, the position
   /// is an offset based on this board
@@ -30,8 +33,6 @@ class Particle {
   /// towards the target position (final destination). When the destination is
   /// reached, the particle will its movement.
   Offset? targetPosition;
-
-  Particle(this.position, this.speed, this.direction, this.tile);
 
   Offset _getNextPosition(Size size) {
     var offset =
