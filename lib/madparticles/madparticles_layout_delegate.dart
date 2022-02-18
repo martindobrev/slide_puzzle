@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:very_good_slide_puzzle/colors/colors.dart';
@@ -112,6 +113,7 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.select((PuzzleBloc bloc) => bloc.state);
+    final tileModels = state.puzzle.tiles;
     return Stack(
       alignment: Alignment.topLeft,
       children: [
@@ -126,8 +128,9 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
         ),
         ParticleController(
           Size(size.toDouble(), size.toDouble()),
-          100,
+          200,
           state,
+          spacing,
           key: const Key('test'),
         ),
       ],

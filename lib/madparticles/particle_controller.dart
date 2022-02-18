@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:very_good_slide_puzzle/madparticles/particle.dart';
+import 'package:very_good_slide_puzzle/models/tile.dart';
 import 'package:very_good_slide_puzzle/puzzle/bloc/puzzle_bloc.dart';
 
 ///
@@ -12,7 +13,8 @@ class ParticleController extends StatefulWidget {
   const ParticleController(
     this.size,
     this.numberOfParticles,
-    this.state, {
+    this.state,
+    this.spacing, {
     required Key key,
   }) : super(key: key);
 
@@ -24,6 +26,8 @@ class ParticleController extends StatefulWidget {
 
   ///
   final PuzzleState state;
+
+  final double spacing;
 
   @override
   State<StatefulWidget> createState() => ParticleControllerState();
@@ -43,14 +47,22 @@ class ParticleControllerState extends State<ParticleController> {
 
     final random = Random();
 
-    for (var i = 0; i < widget.numberOfParticles; i++) {
-      final initialOffset = Offset(
-        random.nextInt(widget.size.width.toInt()).toDouble(),
-        random.nextInt(widget.size.height.toInt()).toDouble(),
-      );
-      final speed = 0.5 + random.nextInt(2).toDouble();
-      final direction = random.nextDouble() * 360;
-      _particles.add(Particle(initialOffset, speed, direction));
+    for (var tile = 0; tile < widget.state.puzzle.tiles.length; tile++) {
+      if (!widget.state.puzzle.tiles[tile].isWhitespace) {
+        for (var i = 0; i < widget.numberOfParticles; i++) {
+          final initialOffset = Offset(
+            random.nextInt(widget.size.width.toInt()).toDouble(),
+            random.nextInt(widget.size.height.toInt()).toDouble(),
+          );
+          final speed = 5 + random.nextInt(10).toDouble();
+          final direction = random.nextDouble() * 360;
+          final particle = Particle(
+              initialOffset, speed, direction, widget.state.puzzle.tiles[tile]);
+          particle.targetPosition =
+              _generateTargetPosition(widget.state.puzzle.tiles[tile]);
+          _particles.add(particle);
+        }
+      }
     }
   }
 
@@ -60,6 +72,20 @@ class ParticleControllerState extends State<ParticleController> {
       particle.move(widget.size);
     }
     setState(() {});
+  }
+
+  Offset _generateTargetPosition(Tile tile) {
+    final size = widget.size.height / 4;
+    final r = Random();
+    final xSpacing = tile.currentPosition.x * widget.spacing;
+    final ySpacing = tile.currentPosition.y * widget.spacing;
+    return Offset(
+        size * (tile.currentPosition.x - 1) +
+            r.nextInt(size.toInt()) +
+            xSpacing,
+        size * (tile.currentPosition.y - 1) +
+            r.nextInt(size.toInt()) +
+            ySpacing);
   }
 
   @override
@@ -118,7 +144,7 @@ class MadParticlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final normalPaint = Paint()
       ..color = Colors.black
-      ..strokeWidth = 2
+      ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
     //normalPaint.blendMode = BlendMode.colorBurn;
     canvas.drawPoints(PointMode.points, particles, normalPaint);

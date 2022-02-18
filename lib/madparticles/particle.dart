@@ -4,15 +4,17 @@ import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vecmath;
+import 'package:very_good_slide_puzzle/models/models.dart';
 
 class Particle {
   Offset position;
   double speed;
   double direction;
+  Tile tile;
 
   Offset? targetPosition;
 
-  Particle(this.position, this.speed, this.direction);
+  Particle(this.position, this.speed, this.direction, this.tile);
 
   Offset _getNextPosition(Size size) {
     var offset =
