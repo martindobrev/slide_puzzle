@@ -66,6 +66,15 @@ class ParticleControllerState extends State<ParticleController> {
     }
   }
 
+  // TODO(maddob): - implement method for generating target positions for tiles
+  List<Offset> _generateTargetPositions(
+    Tile tile,
+    double spacing,
+  ) {
+    //
+    return [];
+  }
+
   void _tick(Duration duration) {
     //print(widget.state.puzzle.toString());
     for (final particle in _particles) {
