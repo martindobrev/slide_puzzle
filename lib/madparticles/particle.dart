@@ -86,7 +86,7 @@ class Particle {
     }
 
     final diff = targetPosition! - position;
-    final offset = Offset.fromDirection(diff.direction, 4);
+    final offset = Offset.fromDirection(diff.direction, speed);
 
     if (diff.distance > offset.distance) {
       return position + offset;

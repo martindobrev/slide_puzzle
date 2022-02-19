@@ -35,8 +35,24 @@ class ParticleController extends StatefulWidget {
 
 ///
 class ParticleControllerState extends State<ParticleController> {
+  final List<List<Particle>> _tileParticles = [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ];
   final List<Particle> _particles = [];
-
   late Ticker _ticker;
 
   @override
@@ -49,18 +65,31 @@ class ParticleControllerState extends State<ParticleController> {
 
     for (var tile = 0; tile < widget.state.puzzle.tiles.length; tile++) {
       if (!widget.state.puzzle.tiles[tile].isWhitespace) {
+        final tileState = widget.state.puzzle.tiles[tile];
+        print('Particle position: ${tileState.value}');
         for (var i = 0; i < widget.numberOfParticles; i++) {
           final initialOffset = Offset(
             random.nextInt(widget.size.width.toInt()).toDouble(),
             random.nextInt(widget.size.height.toInt()).toDouble(),
           );
-          final speed = 5 + random.nextInt(10).toDouble();
+          final speed = 1 + random.nextInt(6).toDouble();
           final direction = random.nextDouble() * 360;
           final particle = Particle(
               initialOffset, speed, direction, widget.state.puzzle.tiles[tile]);
-          particle.targetPosition =
-              _generateTargetPosition(widget.state.puzzle.tiles[tile]);
+          _tileParticles[tileState.value - 1].add(particle);
           _particles.add(particle);
+        }
+
+        final targetPositions = _generateTargetPositions(
+          tileState,
+          widget.spacing,
+        );
+
+        for (var j = 0; j < targetPositions.length; j++) {
+          if (_tileParticles[tileState.value - 1].length - 1 >= j) {
+            _tileParticles[tileState.value - 1][j].targetPosition =
+                targetPositions[j];
+          }
         }
       }
     }
@@ -71,8 +100,21 @@ class ParticleControllerState extends State<ParticleController> {
     Tile tile,
     double spacing,
   ) {
-    //
-    return [];
+    print('Generate target positions for ${tile.toString()}');
+    final sizeOfTile = widget.size.height / 4;
+    final targetPositions = <Offset>[];
+    final offsetX = (tile.currentPosition.x - 1) * sizeOfTile +
+        (tile.currentPosition.x - 1) * spacing;
+    final offsetY = (tile.currentPosition.y - 1) * sizeOfTile +
+        (tile.currentPosition.y - 1) * spacing;
+    for (var i = 0; i < sizeOfTile.toInt(); i++) {
+      targetPositions
+        ..add(Offset(offsetX, i.toDouble() + offsetY))
+        ..add(Offset(i.toDouble() + offsetX, offsetY))
+        ..add(Offset(i.toDouble() + offsetX, offsetY + sizeOfTile))
+        ..add(Offset(offsetX + sizeOfTile, i.toDouble() + offsetY));
+    }
+    return targetPositions;
   }
 
   void _tick(Duration duration) {
@@ -153,7 +195,7 @@ class MadParticlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final normalPaint = Paint()
       ..color = Colors.black
-      ..strokeWidth = 4
+      ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
     //normalPaint.blendMode = BlendMode.colorBurn;
     canvas.drawPoints(PointMode.points, particles, normalPaint);

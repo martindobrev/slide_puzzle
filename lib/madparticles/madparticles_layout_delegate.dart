@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:very_good_slide_puzzle/colors/colors.dart';
 import 'package:very_good_slide_puzzle/l10n/l10n.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
@@ -128,7 +126,7 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
         ),
         ParticleController(
           Size(size.toDouble(), size.toDouble()),
-          200,
+          500,
           state,
           spacing,
           key: const Key('test'),
