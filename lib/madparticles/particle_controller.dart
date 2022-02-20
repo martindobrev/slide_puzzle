@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:very_good_slide_puzzle/madparticles/number_coordinates.dart';
 import 'package:very_good_slide_puzzle/madparticles/particle.dart';
 import 'package:very_good_slide_puzzle/models/tile.dart';
 import 'package:very_good_slide_puzzle/puzzle/bloc/puzzle_bloc.dart';
@@ -107,6 +108,7 @@ class ParticleControllerState extends State<ParticleController> {
         (tile.currentPosition.x - 1) * spacing;
     final offsetY = (tile.currentPosition.y - 1) * sizeOfTile +
         (tile.currentPosition.y - 1) * spacing;
+    final offset = Offset(offsetX, offsetY);
     for (var i = 0; i < sizeOfTile.toInt(); i++) {
       targetPositions
         ..add(Offset(offsetX, i.toDouble() + offsetY))
@@ -114,7 +116,23 @@ class ParticleControllerState extends State<ParticleController> {
         ..add(Offset(i.toDouble() + offsetX, offsetY + sizeOfTile))
         ..add(Offset(offsetX + sizeOfTile, i.toDouble() + offsetY));
     }
-    return targetPositions;
+
+    final tileDigitCoordinates = digitCoordinates[tile.value - 1];
+    for (var j = 0; j < tileDigitCoordinates.length; j++) {
+      targetPositions.add(tileDigitCoordinates[j] + offset);
+    }
+
+    return _reduceTargetPositions(targetPositions, 3);
+  }
+
+  List<Offset> _reduceTargetPositions(List<Offset> positions, int step) {
+    final reducedTargetPositions = <Offset>[];
+    for (var i = 0; i < positions.length; i++) {
+      if (i % step == 0) {
+        reducedTargetPositions.add(positions[i]);
+      }
+    }
+    return reducedTargetPositions;
   }
 
   void _tick(Duration duration) {

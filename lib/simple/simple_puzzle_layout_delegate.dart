@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:very_good_slide_puzzle/colors/colors.dart';
@@ -229,7 +230,7 @@ class SimpleStartSection extends StatelessWidget {
 @visibleForTesting
 class SimplePuzzleTitle extends StatelessWidget {
   /// {@macro simple_puzzle_title}
-  const SimplePuzzleTitle({
+  SimplePuzzleTitle({
     Key? key,
     required this.status,
   }) : super(key: key);
@@ -237,14 +238,31 @@ class SimplePuzzleTitle extends StatelessWidget {
   /// The status of the puzzle.
   final PuzzleStatus status;
 
+  final GlobalKey _globalKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
+    print('BUILD');
+    _captureBackground();
     return PuzzleTitle(
       key: puzzleTitleKey,
       title: status == PuzzleStatus.complete
           ? context.l10n.puzzleCompleted
           : context.l10n.puzzleChallengeTitle,
     );
+  }
+
+  void _captureBackground() async {
+    print('inside');
+    RenderObject? boundary = _globalKey.currentContext?.findRenderObject();
+    print('helloooo');
+    print(boundary.toString());
+    //const image = await boundary.toImage(pixelRatio: 1.0);
+    //print(image.width.toString() + 'x' + image.height.toString());
+    //this.byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    //var pngBytes = byteData.buffer.asUint8List();
+
+    //var decodedImage = img.decodeImage(pngBytes);
   }
 }
 
