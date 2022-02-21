@@ -67,10 +67,10 @@ class ParticleControllerState extends State<ParticleController> {
     super.initState();
     _ticker = Ticker(_tick);
     _ticker.start();
-    setParticlePositions(widget.state.puzzle.tiles);
+    _initialiseParticlePositions(widget.state.puzzle.tiles);
   }
 
-  void setParticlePositions(List<Tile> tiles) {
+  void _initialiseParticlePositions(List<Tile> tiles) {
     final random = Random();
     for (var tile = 0; tile < tiles.length; tile++) {
       if (!widget.state.puzzle.tiles[tile].isWhitespace) {
@@ -79,7 +79,6 @@ class ParticleControllerState extends State<ParticleController> {
           tileState,
           widget.spacing,
         );
-        print('Particle position: ${tileState.value}');
         for (var i = 0; i < targetPositions.length; i++) {
           final initialOffset = Offset(
             random.nextInt(size.width.toInt()).toDouble(),
@@ -144,20 +143,6 @@ class ParticleControllerState extends State<ParticleController> {
     setState(() {});
   }
 
-  Offset _generateTargetPosition(Tile tile) {
-    final size = widget.size.height / 4;
-    final r = Random();
-    final xSpacing = tile.currentPosition.x * widget.spacing;
-    final ySpacing = tile.currentPosition.y * widget.spacing;
-    return Offset(
-        size * (tile.currentPosition.x - 1) +
-            r.nextInt(size.toInt()) +
-            xSpacing,
-        size * (tile.currentPosition.y - 1) +
-            r.nextInt(size.toInt()) +
-            ySpacing);
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -170,8 +155,18 @@ class ParticleControllerState extends State<ParticleController> {
   Widget build(BuildContext context) {
     return BlocListener<PuzzleBloc, PuzzleState>(
       listener: (context, state) async {
-        print(state.toString());
-        setParticlePositions(state.puzzle.tiles);
+        final changedTiles = _calculateChangedTilePositions(
+          widget.state.puzzle.tiles,
+          state.puzzle.tiles,
+        );
+
+        for (var movedTile in changedTiles) {
+          print(movedTile.value);
+          _setTileTargetPositions(
+              movedTile, _generateTargetPositions(movedTile, spacing));
+        }
+
+        //setState(() {});
       },
       child: SizedBox(
         width: widget.size.width,
@@ -183,6 +178,12 @@ class ParticleControllerState extends State<ParticleController> {
         ),
       ),
     );
+  }
+
+  void _setTileTargetPositions(Tile tile, List<Offset> targetPositions) {
+    for (var i = 0; i < targetPositions.length; i++) {
+      _tileParticles[tile.value - 1][i].targetPosition = targetPositions[i];
+    }
   }
 
   ///
@@ -205,6 +206,37 @@ class ParticleControllerState extends State<ParticleController> {
         _particles[i].targetPosition = offsets[i];
       }
     }
+  }
+
+  List<Tile> _calculateChangedTilePositions(
+    List<Tile> currentTiles,
+    List<Tile> changedTiles,
+  ) {
+    var differences = <Tile>[];
+    for (final changedTile in changedTiles) {
+      if (changedTile.isWhitespace) continue;
+
+      final respectiveCurrentTile = currentTiles
+          .firstWhere((element) => changedTile.value == element.value);
+      if (respectiveCurrentTile.currentPosition
+              .compareTo(changedTile.currentPosition) !=
+          0) {
+        differences.add(changedTile);
+      }
+    }
+    return differences;
+    // return changedTiles
+    //     .where(
+    //       (changedTile) =>
+    //           currentTiles
+    //               .firstWhere(
+    //                 (currentTile) => currentTile.value == changedTile.value,
+    //               )
+    //               .currentPosition
+    //               .toString() !=
+    //           changedTile.currentPosition.toString(),
+    //     )
+    //     .toList();
   }
 }
 
