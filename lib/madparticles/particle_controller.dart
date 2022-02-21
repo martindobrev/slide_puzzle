@@ -102,7 +102,7 @@ class ParticleControllerState extends State<ParticleController> {
     double spacing,
   ) {
     print('Generate target positions for ${tile.toString()}');
-    final sizeOfTile = widget.size.height / 4;
+    final sizeOfTile = (widget.size.height - widget.spacing * 3) / 4;
     final targetPositions = <Offset>[];
     final offsetX = (tile.currentPosition.x - 1) * sizeOfTile +
         (tile.currentPosition.x - 1) * spacing;
