@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:very_good_slide_puzzle/madparticles/number_coordinates.dart';
 import 'package:very_good_slide_puzzle/madparticles/particle.dart';
 import 'package:very_good_slide_puzzle/models/tile.dart';
@@ -31,11 +32,16 @@ class ParticleController extends StatefulWidget {
   final double spacing;
 
   @override
-  State<StatefulWidget> createState() => ParticleControllerState();
+  State<StatefulWidget> createState() => ParticleControllerState(size, spacing);
 }
 
 ///
 class ParticleControllerState extends State<ParticleController> {
+  ParticleControllerState(this.size, this.spacing);
+
+  final Size size;
+  final double spacing;
+
   final List<List<Particle>> _tileParticles = [
     [],
     [],
@@ -61,36 +67,31 @@ class ParticleControllerState extends State<ParticleController> {
     super.initState();
     _ticker = Ticker(_tick);
     _ticker.start();
+    setParticlePositions(widget.state.puzzle.tiles);
+  }
 
+  void setParticlePositions(List<Tile> tiles) {
     final random = Random();
-
-    for (var tile = 0; tile < widget.state.puzzle.tiles.length; tile++) {
+    for (var tile = 0; tile < tiles.length; tile++) {
       if (!widget.state.puzzle.tiles[tile].isWhitespace) {
         final tileState = widget.state.puzzle.tiles[tile];
-        print('Particle position: ${tileState.value}');
-        for (var i = 0; i < widget.numberOfParticles; i++) {
-          final initialOffset = Offset(
-            random.nextInt(widget.size.width.toInt()).toDouble(),
-            random.nextInt(widget.size.height.toInt()).toDouble(),
-          );
-          final speed = 1 + random.nextInt(6).toDouble();
-          final direction = random.nextDouble() * 360;
-          final particle = Particle(
-              initialOffset, speed, direction, widget.state.puzzle.tiles[tile]);
-          _tileParticles[tileState.value - 1].add(particle);
-          _particles.add(particle);
-        }
-
         final targetPositions = _generateTargetPositions(
           tileState,
           widget.spacing,
         );
-
-        for (var j = 0; j < targetPositions.length; j++) {
-          if (_tileParticles[tileState.value - 1].length - 1 >= j) {
-            _tileParticles[tileState.value - 1][j].targetPosition =
-                targetPositions[j];
-          }
+        print('Particle position: ${tileState.value}');
+        for (var i = 0; i < targetPositions.length; i++) {
+          final initialOffset = Offset(
+            random.nextInt(size.width.toInt()).toDouble(),
+            random.nextInt(widget.size.height.toInt()).toDouble(),
+          );
+          final speed = 4 + random.nextInt(5).toDouble();
+          final direction = random.nextDouble() * 360;
+          final particle = Particle(
+              initialOffset, speed, direction, widget.state.puzzle.tiles[tile]);
+          _tileParticles[tileState.value - 1].add(particle);
+          particle.targetPosition = targetPositions[i];
+          _particles.add(particle);
         }
       }
     }
@@ -167,12 +168,18 @@ class ParticleControllerState extends State<ParticleController> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.size.width,
-      height: widget.size.height,
-      child: CustomPaint(
-        painter: MadParticlePainter(
-          _particles.map((particle) => particle.position).toList(),
+    return BlocListener<PuzzleBloc, PuzzleState>(
+      listener: (context, state) async {
+        print(state.toString());
+        setParticlePositions(state.puzzle.tiles);
+      },
+      child: SizedBox(
+        width: widget.size.width,
+        height: widget.size.height,
+        child: CustomPaint(
+          painter: MadParticlePainter(
+            _particles.map((particle) => particle.position).toList(),
+          ),
         ),
       ),
     );
@@ -212,7 +219,7 @@ class MadParticlePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final normalPaint = Paint()
-      ..color = Colors.black
+      ..color = Colors.grey.shade800
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
     //normalPaint.blendMode = BlendMode.colorBurn;
