@@ -61,6 +61,7 @@ class ParticleControllerState extends State<ParticleController> {
   ];
   final List<Particle> _particles = [];
   late Ticker _ticker;
+  final GlobalKey _painterKey = GlobalKey();
 
   @override
   void initState() {
@@ -87,7 +88,13 @@ class ParticleControllerState extends State<ParticleController> {
           final speed = 4 + random.nextInt(5).toDouble();
           final direction = random.nextDouble() * 360;
           final particle = Particle(
-              initialOffset, speed, direction, widget.state.puzzle.tiles[tile]);
+            initialOffset,
+            speed,
+            direction,
+            widget.state.puzzle.tiles[tile],
+            easingFunctionList[random.nextInt(easingFunctionList.length)],
+            random.nextInt(50) + 50,
+          );
           _tileParticles[tileState.value - 1].add(particle);
           particle.targetPosition = targetPositions[i];
           _particles.add(particle);
@@ -163,7 +170,9 @@ class ParticleControllerState extends State<ParticleController> {
         for (var movedTile in changedTiles) {
           print(movedTile.value);
           _setTileTargetPositions(
-              movedTile, _generateTargetPositions(movedTile, spacing));
+            movedTile,
+            _generateTargetPositions(movedTile, spacing),
+          );
         }
 
         //setState(() {});
@@ -171,13 +180,48 @@ class ParticleControllerState extends State<ParticleController> {
       child: SizedBox(
         width: widget.size.width,
         height: widget.size.height,
-        child: CustomPaint(
-          painter: MadParticlePainter(
-            _particles.map((particle) => particle.position).toList(),
+        child: Listener(
+          onPointerDown: (event) {
+            RenderBox referenceBox =
+                _painterKey.currentContext!.findRenderObject() as RenderBox;
+            Offset offset = referenceBox.globalToLocal(event.position);
+
+            final x = _getClickPosition(offset.dx.toInt());
+            final y = _getClickPosition(offset.dy.toInt());
+
+            Tile clickedTile = widget.state.puzzle.tiles.firstWhere((element) =>
+                element.currentPosition.x == x &&
+                element.currentPosition.y == y);
+
+            print('Clicked Tile: ${clickedTile.toString()}');
+
+            context.read<PuzzleBloc>().add(TileTapped(clickedTile));
+          },
+          child: CustomPaint(
+            key: _painterKey,
+            painter: MadParticlePainter(
+              _particles.map((particle) => particle.position).toList(),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  int _getClickPosition(int clickPosition) {
+    if (clickPosition < size.width / 4) {
+      return 1;
+    }
+
+    if (clickPosition < size.width / 2) {
+      return 2;
+    }
+
+    if (clickPosition < size.width * 0.75) {
+      return 3;
+    }
+
+    return 4;
   }
 
   void _setTileTargetPositions(Tile tile, List<Offset> targetPositions) {

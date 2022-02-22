@@ -12,7 +12,14 @@ import 'package:very_good_slide_puzzle/models/models.dart';
 /// particle in the MadParticles puzzle board
 class Particle {
   /// Particle class constructor with its basic properties
-  Particle(this.position, this.speed, this.direction, this.tile);
+  Particle(
+    this.position,
+    this.speed,
+    this.direction,
+    this.tile,
+    this.easingFunction,
+    this.framesToTarget,
+  );
 
   /// current position of the particle
   /// Since particles can move across the whole puzzle board, the position
@@ -21,13 +28,19 @@ class Particle {
 
   /// Speed of the particle measured in how many pixels the particle
   /// moves per frame
-  double speed;
+  final double speed;
 
   /// Direction of the particle measured in degrees
   double direction;
 
   /// Tile that the particle belongs to
-  Tile tile;
+  final Tile tile;
+
+  /// Easing function to use when
+  final double Function(double) easingFunction;
+
+  /// Number of frames for the animation to reach the target position
+  final int framesToTarget;
 
   /// When not set, particles move freely across the puzzle board.
   /// If a target position is set, the particle will change its direction
@@ -92,13 +105,13 @@ class Particle {
     if (_targetPosition == null) {
       position = _getNextPosition(size);
     } else {
-      position = getNextPositionCloserToTarget(size);
+      position = _getNextPositionCloserToTarget(size);
       _animationToTargetFrame++;
     }
   }
 
-  Offset getNextPositionCloserToTarget(Size size) {
-    if (_animationToTargetFrame < 200) {
+  Offset _getNextPositionCloserToTarget(Size size) {
+    if (_animationToTargetFrame < framesToTarget) {
       return position + _calculateEaseInOutOffset();
     } else {
       return _targetPosition!;
@@ -106,17 +119,54 @@ class Particle {
   }
 
   Offset _calculateEaseInOutOffset() {
-    final diff = _targetPosition! - _targetMovementStartPosition;
+    final diff = _targetPosition! - position;
     final dx = diff.dx;
     final dy = diff.dy;
 
-    final animationProgress = _animationToTargetFrame / 200;
+    final animationProgress = _animationToTargetFrame / framesToTarget;
 
-    return Offset(dx * _easeOutCubic(animationProgress),
-        dy * _easeOutCubic(animationProgress));
-  }
-
-  double _easeOutCubic(double x) {
-    return (1 - pow(1 - x, 3)).toDouble();
+    return Offset(dx * easingFunction(animationProgress),
+        dy * easingFunction(animationProgress));
   }
 }
+
+///
+/// Easing functions
+///
+/// Copied from easings.net
+///
+
+double _easeOutCubic(double x) {
+  return (1 - pow(1 - x, 3)).toDouble();
+}
+
+double _easeInSine(double x) {
+  return 1 - cos((x * pi) / 2);
+}
+
+double _easeOutSine(double x) {
+  return sin((x * pi) / 2);
+}
+
+double _easeInOutCirc(double x) {
+  return x < 0.5
+      ? (1 - sqrt(1 - pow(2 * x, 2))) / 2
+      : (sqrt(1 - pow(-2 * x + 2, 2)) + 1) / 2;
+}
+
+double _easeInQuint(double x) {
+  return x * x * x * x * x;
+}
+
+double _easeInCubic(double x) {
+  return x * x * x;
+}
+
+const easingFunctionList = [
+  _easeInCubic,
+  _easeInSine,
+  _easeOutSine,
+  //_easeInOutCirc,
+  //_easeInQuint,
+  _easeInCubic,
+];
