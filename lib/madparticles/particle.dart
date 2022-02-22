@@ -1,5 +1,6 @@
 // ignore_for_file: type_annotate_public_apis
 
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as vecmath;
@@ -32,7 +33,22 @@ class Particle {
   /// If a target position is set, the particle will change its direction
   /// towards the target position (final destination). When the destination is
   /// reached, the particle will its movement.
-  Offset? targetPosition;
+  Offset? _targetPosition;
+
+  /// Setter for the target position
+  ///
+  /// Initiates the calculation of the EaseOutCubic animation towards target
+  /// For that the current position needs to be stored, also the frame counter
+  /// is resetted
+  ///
+  set targetPosition(Offset? targetPosition) {
+    _targetMovementStartPosition = position;
+    _animationToTargetFrame = 0;
+    _targetPosition = targetPosition;
+  }
+
+  Offset _targetMovementStartPosition = Offset.zero;
+  int _animationToTargetFrame = 0;
 
   Offset _getNextPosition(Size size) {
     var offset =
@@ -73,25 +89,34 @@ class Particle {
   /// to the target position
   ///
   void move(Size size) {
-    if (targetPosition == null) {
+    if (_targetPosition == null) {
       position = _getNextPosition(size);
     } else {
-      position = _getNextPositionCloserToTarget(size);
+      position = getNextPositionCloserToTarget(size);
+      _animationToTargetFrame++;
     }
   }
 
-  Offset _getNextPositionCloserToTarget(Size size) {
-    if (targetPosition == null) {
-      return Offset.zero;
+  Offset getNextPositionCloserToTarget(Size size) {
+    if (_animationToTargetFrame < 200) {
+      return position + _calculateEaseInOutOffset();
+    } else {
+      return _targetPosition!;
     }
+  }
 
-    final diff = targetPosition! - position;
-    final offset = Offset.fromDirection(diff.direction, speed);
+  Offset _calculateEaseInOutOffset() {
+    final diff = _targetPosition! - _targetMovementStartPosition;
+    final dx = diff.dx;
+    final dy = diff.dy;
 
-    if (diff.distance > offset.distance) {
-      return position + offset;
-    }
+    final animationProgress = _animationToTargetFrame / 200;
 
-    return targetPosition!;
+    return Offset(dx * _easeOutCubic(animationProgress),
+        dy * _easeOutCubic(animationProgress));
+  }
+
+  double _easeOutCubic(double x) {
+    return (1 - pow(1 - x, 3)).toDouble();
   }
 }
