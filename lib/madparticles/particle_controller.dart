@@ -29,19 +29,15 @@ class ParticleController extends StatefulWidget {
   ///
   final PuzzleState state;
 
+  /// spacing between the tiles
   final double spacing;
 
   @override
-  State<StatefulWidget> createState() => ParticleControllerState(size, spacing);
+  State<StatefulWidget> createState() => ParticleControllerState();
 }
 
 ///
 class ParticleControllerState extends State<ParticleController> {
-  ParticleControllerState(this.size, this.spacing);
-
-  final Size size;
-  final double spacing;
-
   final List<List<Particle>> _tileParticles = [
     [],
     [],
@@ -82,7 +78,7 @@ class ParticleControllerState extends State<ParticleController> {
         );
         for (var i = 0; i < targetPositions.length; i++) {
           final initialOffset = Offset(
-            random.nextInt(size.width.toInt()).toDouble(),
+            random.nextInt(widget.size.width.toInt()).toDouble(),
             random.nextInt(widget.size.height.toInt()).toDouble(),
           );
           final speed = 4 + random.nextInt(5).toDouble();
@@ -103,18 +99,16 @@ class ParticleControllerState extends State<ParticleController> {
     }
   }
 
-  // TODO(maddob): - implement method for generating target positions for tiles
   List<Offset> _generateTargetPositions(
     Tile tile,
     double spacing,
   ) {
-    print('Generate target positions for ${tile.toString()}');
     final sizeOfTile = (widget.size.height - widget.spacing * 3) / 4;
     final targetPositions = <Offset>[];
     final offsetX = (tile.currentPosition.x - 1) * sizeOfTile +
-        (tile.currentPosition.x - 1) * spacing;
+        (tile.currentPosition.x - 1) * widget.spacing;
     final offsetY = (tile.currentPosition.y - 1) * sizeOfTile +
-        (tile.currentPosition.y - 1) * spacing;
+        (tile.currentPosition.y - 1) * widget.spacing;
     final offset = Offset(offsetX, offsetY);
     for (var i = 0; i < sizeOfTile.toInt(); i++) {
       targetPositions
@@ -167,11 +161,10 @@ class ParticleControllerState extends State<ParticleController> {
           state.puzzle.tiles,
         );
 
-        for (var movedTile in changedTiles) {
-          print(movedTile.value);
+        for (final movedTile in changedTiles) {
           _setTileTargetPositions(
             movedTile,
-            _generateTargetPositions(movedTile, spacing),
+            _generateTargetPositions(movedTile, widget.spacing),
           );
         }
 
@@ -182,19 +175,18 @@ class ParticleControllerState extends State<ParticleController> {
         height: widget.size.height,
         child: Listener(
           onPointerDown: (event) {
-            RenderBox referenceBox =
+            final referenceBox =
                 _painterKey.currentContext!.findRenderObject() as RenderBox;
-            Offset offset = referenceBox.globalToLocal(event.position);
+            final offset = referenceBox.globalToLocal(event.position);
 
             final x = _getClickPosition(offset.dx.toInt());
             final y = _getClickPosition(offset.dy.toInt());
 
-            Tile clickedTile = widget.state.puzzle.tiles.firstWhere((element) =>
-                element.currentPosition.x == x &&
-                element.currentPosition.y == y);
-
-            print('Clicked Tile: ${clickedTile.toString()}');
-
+            final clickedTile = widget.state.puzzle.tiles.firstWhere(
+              (element) =>
+                  element.currentPosition.x == x &&
+                  element.currentPosition.y == y,
+            );
             context.read<PuzzleBloc>().add(TileTapped(clickedTile));
           },
           child: CustomPaint(
@@ -209,15 +201,15 @@ class ParticleControllerState extends State<ParticleController> {
   }
 
   int _getClickPosition(int clickPosition) {
-    if (clickPosition < size.width / 4) {
+    if (clickPosition < widget.size.width / 4) {
       return 1;
     }
 
-    if (clickPosition < size.width / 2) {
+    if (clickPosition < widget.size.width / 2) {
       return 2;
     }
 
-    if (clickPosition < size.width * 0.75) {
+    if (clickPosition < widget.size.width * 0.75) {
       return 3;
     }
 
@@ -256,7 +248,7 @@ class ParticleControllerState extends State<ParticleController> {
     List<Tile> currentTiles,
     List<Tile> changedTiles,
   ) {
-    var differences = <Tile>[];
+    final differences = <Tile>[];
     for (final changedTile in changedTiles) {
       if (changedTile.isWhitespace) continue;
 
@@ -269,18 +261,6 @@ class ParticleControllerState extends State<ParticleController> {
       }
     }
     return differences;
-    // return changedTiles
-    //     .where(
-    //       (changedTile) =>
-    //           currentTiles
-    //               .firstWhere(
-    //                 (currentTile) => currentTile.value == changedTile.value,
-    //               )
-    //               .currentPosition
-    //               .toString() !=
-    //           changedTile.currentPosition.toString(),
-    //     )
-    //     .toList();
   }
 }
 
