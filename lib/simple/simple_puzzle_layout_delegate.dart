@@ -242,27 +242,12 @@ class SimplePuzzleTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('BUILD');
-    _captureBackground();
     return PuzzleTitle(
       key: puzzleTitleKey,
       title: status == PuzzleStatus.complete
           ? context.l10n.puzzleCompleted
           : context.l10n.puzzleChallengeTitle,
     );
-  }
-
-  void _captureBackground() async {
-    print('inside');
-    RenderObject? boundary = _globalKey.currentContext?.findRenderObject();
-    print('helloooo');
-    print(boundary.toString());
-    //const image = await boundary.toImage(pixelRatio: 1.0);
-    //print(image.width.toString() + 'x' + image.height.toString());
-    //this.byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    //var pngBytes = byteData.buffer.asUint8List();
-
-    //var decodedImage = img.decodeImage(pngBytes);
   }
 }
 

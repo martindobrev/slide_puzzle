@@ -217,6 +217,7 @@ class ParticleControllerState extends State<ParticleController> {
   }
 
   void _setTileTargetPositions(Tile tile, List<Offset> targetPositions) {
+    targetPositions.shuffle();
     for (var i = 0; i < targetPositions.length; i++) {
       _tileParticles[tile.value - 1][i].targetPosition = targetPositions[i];
     }
