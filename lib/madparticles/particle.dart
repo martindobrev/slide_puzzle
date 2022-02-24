@@ -166,7 +166,8 @@ const easingFunctionList = [
   _easeInCubic,
   _easeInSine,
   _easeOutSine,
-  //_easeInOutCirc,
-  //_easeInQuint,
+  _easeInOutCirc,
+  _easeInQuint,
   _easeInCubic,
+  _easeOutCubic,
 ];

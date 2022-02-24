@@ -119,8 +119,14 @@ class ParticleControllerState extends State<ParticleController> {
     }
 
     final tileDigitCoordinates = digitCoordinates[tile.value - 1];
-    for (var j = 0; j < tileDigitCoordinates.length; j++) {
-      targetPositions.add(tileDigitCoordinates[j] + offset);
+    final bboxDigit = tileDigitCoordinates[0];
+    final offsetToCenterDigit = Offset(
+      (sizeOfTile - bboxDigit.dx) / 2 - 3,
+      (sizeOfTile - bboxDigit.dy) / 2 - 3,
+    );
+    for (var j = 1; j < tileDigitCoordinates.length; j++) {
+      targetPositions
+          .add(tileDigitCoordinates[j] + offset + offsetToCenterDigit);
     }
 
     return _reduceTargetPositions(targetPositions, 3);
@@ -167,8 +173,6 @@ class ParticleControllerState extends State<ParticleController> {
             _generateTargetPositions(movedTile, widget.spacing),
           );
         }
-
-        //setState(() {});
       },
       child: SizedBox(
         width: widget.size.width,
