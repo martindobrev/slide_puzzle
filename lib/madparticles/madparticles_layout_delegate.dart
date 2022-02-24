@@ -58,12 +58,6 @@ class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
   }
 }
 
-abstract class _TileFontSize {
-  static double small = 36;
-  static double medium = 50;
-  static double large = 54;
-}
-
 abstract class _BoardSize {
   static double small = 312;
   static double medium = 424;
@@ -91,26 +85,12 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
     return SizedBox(
       width: size.toDouble(),
       height: size.toDouble(),
-      child: Stack(
-        alignment: Alignment.topLeft,
-        children: [
-          // GridView.count(
-          //   padding: EdgeInsets.zero,
-          //   shrinkWrap: true,
-          //   physics: const NeverScrollableScrollPhysics(),
-          //   crossAxisCount: size,
-          //   mainAxisSpacing: spacing,
-          //   crossAxisSpacing: spacing,
-          //   children: [
-          //               ),
-          ParticleController(
-            Size(size.toDouble(), size.toDouble()),
-            400,
-            state,
-            spacing,
-            key: const Key('test'),
-          ),
-        ],
+      child: ParticleController(
+        Size(size.toDouble(), size.toDouble()),
+        400,
+        state,
+        spacing,
+        key: const Key('particle controller'),
       ),
     );
   }

@@ -60,7 +60,11 @@ class Particle {
     _targetPosition = targetPosition;
   }
 
+  /// Getter for the target position
+  Offset? get targetPosition => _targetPosition;
+
   Offset _targetMovementStartPosition = Offset.zero;
+
   int _animationToTargetFrame = 0;
 
   Offset _getNextPosition(Size size) {
