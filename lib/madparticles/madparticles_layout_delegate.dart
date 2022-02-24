@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:very_good_slide_puzzle/colors/colors.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
+import 'package:very_good_slide_puzzle/madparticles/particle_controller.dart';
 import 'package:very_good_slide_puzzle/models/models.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
 import 'package:very_good_slide_puzzle/simple/simple_puzzle_layout_delegate.dart';
-
-import 'particle_controller.dart';
 
 class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
   const MadParticlesLayoutDelegate() : super();

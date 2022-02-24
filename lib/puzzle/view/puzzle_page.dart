@@ -36,17 +36,17 @@ class PuzzlePage extends StatelessWidget {
             ],
           ),
         ),
-        BlocProvider(
-          create: (_) => DashatarPuzzleBloc(
-            secondsToBegin: 3,
-            ticker: const Ticker(),
-          ),
-        ),
+        // BlocProvider(
+        //   create: (_) => DashatarPuzzleBloc(
+        //     secondsToBegin: 3,
+        //     ticker: const Ticker(),
+        //   ),
+        // ),
         BlocProvider(
           create: (context) => ThemeBloc(
             initialThemes: [
               const SimpleTheme(),
-              context.read<DashatarThemeBloc>().state.theme,
+              // context.read<DashatarThemeBloc>().state.theme,
               const MadParticlesTheme(),
             ],
           ),
