@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
@@ -10,9 +11,18 @@ import 'package:very_good_slide_puzzle/models/tile.dart';
 import 'package:very_good_slide_puzzle/puzzle/bloc/puzzle_bloc.dart';
 
 ///
-class ParticleController extends StatefulWidget {
+/// Particle Controller
+///
+/// Initializes the particles and orders them to represent the
+/// puzzle state. Each tile consist of multiple particles. Each particle
+/// moves freely inside the board, when it receives a target position, it
+/// is moved towards this position. Moving tiles is done by changing target
+/// positions of the particles.
+///
+///
+class MadParticleController extends StatefulWidget {
   ///
-  const ParticleController(
+  const MadParticleController(
     this.size,
     this.numberOfParticles,
     this.state,
@@ -23,21 +33,21 @@ class ParticleController extends StatefulWidget {
   ///
   final int numberOfParticles;
 
-  ///
+  /// Size of the puzzle board
   final Size size;
 
-  ///
+  /// State of the puzzle
   final PuzzleState state;
 
   /// spacing between the tiles
   final double spacing;
 
   @override
-  State<StatefulWidget> createState() => ParticleControllerState();
+  State<StatefulWidget> createState() => MadParticleControllerState();
 }
 
-///
-class ParticleControllerState extends State<ParticleController> {
+/// State of the particle controller
+class MadParticleControllerState extends State<MadParticleController> {
   final List<List<Particle>> _tileParticles = [
     [],
     [],
@@ -57,6 +67,8 @@ class ParticleControllerState extends State<ParticleController> {
   ];
   final List<Particle> _particles = [];
   late Ticker _ticker;
+  late Timer _secondsTimer;
+  int _secondsCounter = 0;
   final GlobalKey _painterKey = GlobalKey();
 
   @override
@@ -64,7 +76,16 @@ class ParticleControllerState extends State<ParticleController> {
     super.initState();
     _ticker = Ticker(_tick);
     _ticker.start();
+    const oneSecondDuration = Duration(seconds: 1);
+
     _initialiseParticlePositions(widget.state.puzzle.tiles);
+    _secondsTimer = Timer.periodic(oneSecondDuration, (timer) {
+      _secondsCounter++;
+      final currentDuration = Duration(seconds: _secondsCounter);
+      final minutes = currentDuration.inMinutes;
+      final seconds = currentDuration.inSeconds;
+      print('$minutes:$seconds');
+    });
   }
 
   void _initialiseParticlePositions(List<Tile> tiles) {
@@ -97,6 +118,10 @@ class ParticleControllerState extends State<ParticleController> {
         }
       }
     }
+
+    // for (final i = 0, i < 100; i++) {
+    //   initialOffset
+    // }
   }
 
   List<Offset> _generateTargetPositions(

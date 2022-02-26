@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:very_good_slide_puzzle/layout/layout.dart';
-import 'package:very_good_slide_puzzle/madparticles/particle_controller.dart';
-import 'package:very_good_slide_puzzle/models/models.dart';
+import 'package:very_good_slide_puzzle/madparticles/mad_particle_controller.dart';
 import 'package:very_good_slide_puzzle/puzzle/puzzle.dart';
 import 'package:very_good_slide_puzzle/simple/simple_puzzle_layout_delegate.dart';
 
+///
+/// MadParticles Layout Delegate
+///
+/// Overrides the boardBuilder method to display the
+/// modified MadParticlesPuzzleBoard
+///
 class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
+  /// Constructor
   const MadParticlesLayoutDelegate() : super();
 
   @override
@@ -51,11 +57,6 @@ class MadParticlesLayoutDelegate extends SimplePuzzleLayoutDelegate {
       ],
     );
   }
-
-  @override
-  Widget tileBuilder(Tile tile, PuzzleState state) {
-    return super.tileBuilder(tile, state);
-  }
 }
 
 abstract class _BoardSize {
@@ -66,9 +67,13 @@ abstract class _BoardSize {
 
 /// Puzzle board for the MadParticles
 class MadParticlesPuzzleBoard extends StatelessWidget {
-  const MadParticlesPuzzleBoard(
-      {Key? key, required this.size, required this.tiles, this.spacing = 8})
-      : super(key: key);
+  /// Constructor
+  const MadParticlesPuzzleBoard({
+    Key? key,
+    required this.size,
+    required this.tiles,
+    this.spacing = 8,
+  }) : super(key: key);
 
   /// The size of the board.
   final int size;
@@ -85,7 +90,7 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
     return SizedBox(
       width: size.toDouble(),
       height: size.toDouble(),
-      child: ParticleController(
+      child: MadParticleController(
         Size(size.toDouble(), size.toDouble()),
         400,
         state,
