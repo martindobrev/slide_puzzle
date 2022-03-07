@@ -92,7 +92,7 @@ class MadParticlesPuzzleBoard extends StatelessWidget {
       height: size.toDouble(),
       child: MadParticleController(
         Size(size.toDouble(), size.toDouble()),
-        400,
+        400, // parameter left for experiments, currently unused
         state,
         spacing,
         key: const Key('particle controller'),

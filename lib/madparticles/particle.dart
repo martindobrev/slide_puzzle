@@ -166,6 +166,9 @@ double _easeInCubic(double x) {
   return x * x * x;
 }
 
+///
+/// List of all available easing functions
+///
 const easingFunctionList = [
   _easeInCubic,
   _easeInSine,

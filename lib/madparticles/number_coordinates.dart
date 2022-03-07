@@ -1,5 +1,13 @@
 import 'dart:ui';
 
+///
+/// Hardcoded coordinates of the particles for building different digits
+///
+/// The original idea was to get the coordinates from the rendered simple
+/// puzzle, but due to difficulties getting the components that are currently
+/// not rendered, a simple hardcoded version was chosen
+///
+
 const one = [
   Offset(13, 26), // BBox of the digit
   Offset(4, 9),

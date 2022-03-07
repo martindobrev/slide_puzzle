@@ -21,7 +21,7 @@ import 'package:very_good_slide_puzzle/puzzle/bloc/puzzle_bloc.dart';
 ///
 ///
 class MadParticleController extends StatefulWidget {
-  ///
+  /// Constructor with necessary parameters
   const MadParticleController(
     this.size,
     this.numberOfParticles,
@@ -30,7 +30,7 @@ class MadParticleController extends StatefulWidget {
     required Key key,
   }) : super(key: key);
 
-  ///
+  /// Left for experiments (currently unused)
   final int numberOfParticles;
 
   /// Size of the puzzle board
@@ -67,6 +67,9 @@ class MadParticleControllerState extends State<MadParticleController> {
   ];
   final List<Particle> _particles = [];
   late Ticker _ticker;
+
+  /// Timer for the seconds
+  /// counter of seconds is planned, but will probably not be ready
   late Timer _secondsTimer;
   int _secondsCounter = 0;
   final GlobalKey _painterKey = GlobalKey();
@@ -118,10 +121,6 @@ class MadParticleControllerState extends State<MadParticleController> {
         }
       }
     }
-
-    // for (final i = 0, i < 100; i++) {
-    //   initialOffset
-    // }
   }
 
   List<Offset> _generateTargetPositions(
@@ -154,6 +153,8 @@ class MadParticleControllerState extends State<MadParticleController> {
           .add(tileDigitCoordinates[j] + offset + offsetToCenterDigit);
     }
 
+    /// Reduce size of the particles, since they are bigger than 1px
+    /// overlapping occurs
     return _reduceTargetPositions(targetPositions, 3);
   }
 
@@ -168,7 +169,6 @@ class MadParticleControllerState extends State<MadParticleController> {
   }
 
   void _tick(Duration duration) {
-    //print(widget.state.puzzle.toString());
     for (final particle in _particles) {
       particle.move(widget.size);
     }
@@ -249,28 +249,6 @@ class MadParticleControllerState extends State<MadParticleController> {
     targetPositions.shuffle();
     for (var i = 0; i < targetPositions.length; i++) {
       _tileParticles[tile.value - 1][i].targetPosition = targetPositions[i];
-    }
-  }
-
-  ///
-  void setTargetPositions(List<Offset> offsets) {
-    if (offsets.isEmpty) {
-      for (var i = 0; i < _particles.length; i++) {
-        _particles[i].targetPosition = null;
-      }
-      return;
-    }
-
-    var ratio = 1.0;
-    if (offsets.length > _particles.length) {
-      ratio = offsets.length / _particles.length;
-      for (var i = 0; i < _particles.length; i++) {
-        _particles[i].targetPosition = offsets[(i * ratio).ceil()];
-      }
-    } else {
-      for (var i = 0; i < offsets.length; i++) {
-        _particles[i].targetPosition = offsets[i];
-      }
     }
   }
 
